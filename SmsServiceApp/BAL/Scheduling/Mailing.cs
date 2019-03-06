@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Quartz;
 using Model.Interfaces;
 using AutoMapper;
 using WebCustomerApp.Services;
@@ -8,12 +7,9 @@ using Model.DTOs;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace BAL.Jobs
+namespace BAL.Scheduling
 {
-    /// <summary>
-    /// IJob implementation for sending messages through SMPP
-    /// </summary>
-    public class Mailing : IJob, IDisposable
+    public class Mailing
     {
         private readonly IMailingManager mailingManager;
         private readonly IMapper mapper;
@@ -24,7 +20,7 @@ namespace BAL.Jobs
             this.mapper = mapper;
         }
 
-        public async Task Execute(IJobExecutionContext context)
+        public async Task Execute()
         {
             var result = await mailingManager.GetUnsentMessages();
             if (!result.Any())
@@ -66,26 +62,5 @@ namespace BAL.Jobs
                 Console.WriteLine("Connection error");
             }
         }
-
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    mailingManager.Dispose();
-                }
-                disposedValue = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-        #endregion
     }
 }
